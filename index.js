@@ -640,6 +640,10 @@ async function backfillThenSchedule(pg, verbose) {
 async function startHttpServer(pg, defaultVerbose, port) {
   const app = express();
   app.use(express.json());
+  const publicDir = path.join(process.cwd(), "public");
+  if (fs.existsSync(publicDir)) {
+    app.use(express.static(publicDir));
+  }
 
   const routeBase = `/api/reports/${PTR_REP_788_REFERENCE}`;
 

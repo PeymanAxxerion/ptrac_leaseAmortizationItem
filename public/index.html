@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PTAmort Data Control Panel</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+      }
+
+      .card {
+        width: min(480px, 100%);
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.6);
+      }
+
+      h1 {
+        margin: 0 0 0.75rem;
+        font-size: 1.75rem;
+        text-align: center;
+      }
+
+      p {
+        margin: 0 0 1.5rem;
+        text-align: center;
+        color: #94a3b8;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.4rem;
+        font-weight: 600;
+      }
+
+      input {
+        width: 100%;
+        padding: 0.65rem 0.8rem;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        background: rgba(15, 23, 42, 0.4);
+        color: inherit;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      button {
+        width: 100%;
+        padding: 0.75rem;
+        background: linear-gradient(135deg, #0ea5e9, #6366f1);
+        border: none;
+        border-radius: 999px;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(14, 165, 233, 0.35);
+      }
+
+      button:disabled {
+        opacity: 0.6;
+        cursor: wait;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+      }
+
+      .status-tile {
+        padding: 0.75rem;
+        border-radius: 12px;
+        background: rgba(30, 41, 59, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        font-size: 0.85rem;
+      }
+
+      .status-tile strong {
+        display: block;
+        margin-bottom: 0.35rem;
+        font-size: 0.9rem;
+        color: #f8fafc;
+      }
+
+      .actions {
+        display: grid;
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+
+      .error {
+        color: #f87171;
+        margin-top: 0.5rem;
+        text-align: center;
+        min-height: 1.5rem;
+      }
+
+      .success {
+        color: #4ade80;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 1.5rem 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <section id="login-section">
+        <h1>PTAmort Control</h1>
+        <p>Enter credentials to manage report sweeps.</p>
+        <label for="username">Username</label>
+        <input id="username" autocomplete="username" />
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" />
+        <button id="login-btn">Sign In</button>
+        <div id="login-error" class="error"></div>
+      </section>
+
+      <section id="dashboard-section" class="hidden">
+        <h1>PTR-REP-788 Dashboard</h1>
+        <p>Trigger sweeps and inspect live status.</p>
+        <div class="actions">
+          <button id="refresh-btn">Run Last 15 Minutes</button>
+          <button id="catchup-btn">Catch Up Last 7 Days</button>
+          <button id="status-btn">Refresh Status</button>
+        </div>
+        <div id="action-feedback" class="error"></div>
+
+        <div class="status-grid" id="status-grid">
+          <!-- Filled dynamically -->
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const EXPECTED_USER = "admin";
+      const EXPECTED_PASS = "ptamortdata001";
+
+      const loginSection = document.getElementById("login-section");
+      const dashboardSection = document.getElementById("dashboard-section");
+      const loginBtn = document.getElementById("login-btn");
+      const loginError = document.getElementById("login-error");
+      const usernameInput = document.getElementById("username");
+      const passwordInput = document.getElementById("password");
+      const refreshBtn = document.getElementById("refresh-btn");
+      const catchupBtn = document.getElementById("catchup-btn");
+      const statusBtn = document.getElementById("status-btn");
+      const statusGrid = document.getElementById("status-grid");
+      const actionFeedback = document.getElementById("action-feedback");
+
+      function setFeedback(message, kind = "error") {
+        actionFeedback.textContent = message ?? "";
+        actionFeedback.className = kind === "success" ? "error success" : "error";
+      }
+
+      function renderStatus(status) {
+        if (!status || typeof status !== "object") {
+          statusGrid.innerHTML = "<p>No status data.</p>";
+          return;
+        }
+        const entries = [
+          ["Reference", status.reference],
+          ["State", status.status],
+          ["Started", status.startedAt],
+          ["Last Requested", status.lastRequestedAt],
+          ["Last Run Start", status.lastRunStartedAt],
+          ["Last Run Finish", status.lastRunFinishedAt],
+          ["Next Run", status.nextRun],
+          ["In Progress", status.isTickRunning ? "Yes" : "No"],
+          ["Last Error", status.lastError ?? "None"],
+          ["Catchup Days", status.lastCatchupDays ?? "-"],
+          ["Delay / call (ms)", status.delayPerCallMs],
+          ["Minutes / sweep", status.minutesPerSweep],
+          ["Preferred Verbose", status.preferredVerbose ? "Yes" : "No"]
+        ];
+        statusGrid.innerHTML = entries
+          .map(
+            ([label, value]) => `
+              <div class="status-tile">
+                <strong>${label}</strong>
+                <span>${value ?? "-"}</span>
+              </div>
+            `
+          )
+          .join("");
+      }
+
+      async function fetchStatus() {
+        try {
+          const resp = await fetch("/api/reports/PTR-REP-788/status", {
+            headers: { "Accept": "application/json" }
+          });
+          if (!resp.ok) throw new Error("HTTP " + resp.status);
+          const data = await resp.json();
+          renderStatus(data);
+        } catch (err) {
+          console.error("Status fetch failed:", err);
+          setFeedback("Failed to fetch status: " + err.message);
+        }
+      }
+
+      async function postJson(url, body) {
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify(body)
+        });
+        if (!resp.ok) {
+          const text = await resp.text();
+          throw new Error(resp.status + " " + resp.statusText + ": " + text);
+        }
+        return resp.json();
+      }
+
+      loginBtn.addEventListener("click", () => {
+        const user = usernameInput.value.trim();
+        const pass = passwordInput.value;
+        if (user !== EXPECTED_USER || pass !== EXPECTED_PASS) {
+          loginError.textContent = "Invalid credentials.";
+          return;
+        }
+        loginError.textContent = "";
+        loginSection.classList.add("hidden");
+        dashboardSection.classList.remove("hidden");
+        fetchStatus();
+        setInterval(fetchStatus, 60_000);
+      });
+
+      refreshBtn.addEventListener("click", async () => {
+        try {
+          refreshBtn.disabled = true;
+          setFeedback("Triggering 15-minute sweep...");
+          await postJson("/api/reports/PTR-REP-788/refresh", { verbose: true });
+          setFeedback("15-minute sweep triggered.", "success");
+          await fetchStatus();
+        } catch (err) {
+          console.error(err);
+          setFeedback("Refresh failed: " + err.message);
+        } finally {
+          refreshBtn.disabled = false;
+        }
+      });
+
+      catchupBtn.addEventListener("click", async () => {
+        try {
+          catchupBtn.disabled = true;
+          setFeedback("Starting 7-day catchup...");
+          await postJson("/api/reports/PTR-REP-788/catchup", { days: 7, verbose: true });
+          setFeedback("Catchup triggered.", "success");
+          await fetchStatus();
+        } catch (err) {
+          console.error(err);
+          setFeedback("Catchup failed: " + err.message);
+        } finally {
+          catchupBtn.disabled = false;
+        }
+      });
+
+      statusBtn.addEventListener("click", fetchStatus);
+
+      passwordInput.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          loginBtn.click();
+        }
+      });
+    </script>
+  </body>
+</html>
