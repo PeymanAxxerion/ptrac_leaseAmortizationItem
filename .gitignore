@@ -1,0 +1,9 @@
+# Ignore Node.js dependencies
+node_modules/
+
+# Ignore dump files or folders
+dumps/
+
+# Optional: also ignore log files and environment files
+*.log
+.env

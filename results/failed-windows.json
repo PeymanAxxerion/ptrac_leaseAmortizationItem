@@ -1,0 +1,29 @@
+[
+  {
+    "start": "2028-01-31T00:00:00.000-08:00",
+    "end": "2028-02-01T00:00:00.000-08:00",
+    "message": "stream has been aborted",
+    "raw": "AxiosError: stream has been aborted\n    at IncomingMessage.handlerStreamAborted (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/node_modules/axios/lib/adapters/http.js:589:23)\n    at IncomingMessage.emit (node:events:519:28)\n    at IncomingMessage._destroy (node:_http_incoming:224:10)\n    at _destroy (node:internal/streams/destroy:121:10)\n    at IncomingMessage.destroy (node:internal/streams/destroy:83:5)\n    at TLSSocket.socketCloseListener (node:_http_client:455:11)\n    at TLSSocket.emit (node:events:531:35)\n    at node:net:337:12\n    at TCP.done (node:_tls_wrap:657:7)\n    at Axios.request (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/node_modules/axios/lib/core/Axios.js:45:41)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async callAxxerion (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/index.js:267:16)\n    at async processWindow (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/index.js:332:19)\n    at async Promise.allSettled (index 29)\n    at async processDailyBatch (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/index.js:371:19)\n    at async processDailyRange (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/index.js:442:5)\n    at async backfillThenSchedule (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/index.js:461:3)\n    at async file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/index.js:504:3",
+    "firstOccurredAt": "2025-10-25T01:59:32.062Z",
+    "lastOccurredAt": "2025-10-25T01:59:32.062Z",
+    "count": 1
+  },
+  {
+    "start": "2028-04-30T00:00:00.000-07:00",
+    "end": "2028-05-01T00:00:00.000-07:00",
+    "message": "stream has been aborted",
+    "raw": "AxiosError: stream has been aborted\n    at IncomingMessage.handlerStreamAborted (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/node_modules/axios/lib/adapters/http.js:589:23)\n    at IncomingMessage.emit (node:events:519:28)\n    at IncomingMessage._destroy (node:_http_incoming:224:10)\n    at _destroy (node:internal/streams/destroy:121:10)\n    at IncomingMessage.destroy (node:internal/streams/destroy:83:5)\n    at TLSSocket.socketCloseListener (node:_http_client:455:11)\n    at TLSSocket.emit (node:events:531:35)\n    at node:net:337:12\n    at TCP.done (node:_tls_wrap:657:7)\n    at Axios.request (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/node_modules/axios/lib/core/Axios.js:45:41)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async callAxxerion (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/index.js:267:16)\n    at async processWindow (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/index.js:332:19)\n    at async Promise.allSettled (index 29)\n    at async processDailyBatch (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/index.js:371:19)\n    at async processDailyRange (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/index.js:442:5)\n    at async backfillThenSchedule (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/index.js:461:3)\n    at async file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/index.js:504:3",
+    "firstOccurredAt": "2025-10-25T02:33:31.216Z",
+    "lastOccurredAt": "2025-10-25T02:33:31.216Z",
+    "count": 1
+  },
+  {
+    "start": "2029-10-31T00:00:00.000-07:00",
+    "end": "2029-11-01T00:00:00.000-07:00",
+    "message": "stream has been aborted",
+    "raw": "AxiosError: stream has been aborted\n    at IncomingMessage.handlerStreamAborted (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/node_modules/axios/lib/adapters/http.js:589:23)\n    at IncomingMessage.emit (node:events:519:28)\n    at IncomingMessage._destroy (node:_http_incoming:224:10)\n    at _destroy (node:internal/streams/destroy:121:10)\n    at IncomingMessage.destroy (node:internal/streams/destroy:83:5)\n    at TLSSocket.socketCloseListener (node:_http_client:455:11)\n    at TLSSocket.emit (node:events:531:35)\n    at node:net:337:12\n    at TCP.done (node:_tls_wrap:657:7)\n    at Axios.request (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/node_modules/axios/lib/core/Axios.js:45:41)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async callAxxerion (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/index.js:267:16)\n    at async processWindow (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/index.js:332:19)\n    at async Promise.allSettled (index 8)\n    at async processDailyBatch (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/index.js:371:19)\n    at async processDailyRange (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/index.js:442:5)\n    at async backfillThenSchedule (file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/index.js:461:3)\n    at async file:///F:/Gitea%20Repo/ptrac_leaseAmortizationItem/index.js:504:3",
+    "firstOccurredAt": "2025-10-25T05:05:22.593Z",
+    "lastOccurredAt": "2025-10-25T05:05:22.593Z",
+    "count": 1
+  }
+]
