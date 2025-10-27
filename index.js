@@ -2,6 +2,7 @@ import axios from "axios";
 import { Client } from "pg";
 import { DateTime } from "luxon";
 import { CronJob } from "cron";
+import express from "express";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import fs from "fs";
@@ -11,6 +12,7 @@ import path from "path";
 const AX_URL = "https://ptrac.axxerion.us/webservices/ptrac/rest/functions/completereportresult";
 const AX_AUTH_BASIC = "Basic YXh1cHRyYWM6UXJlcG9pITU1";
 const AX_REFERENCE = "PTR-REP-783";
+const PTR_REP_788_REFERENCE = "PTR-REP-788";
 const TZ = "America/Los_Angeles";
 
 const PG = {
@@ -32,6 +34,9 @@ const DAILY_BATCH_SIZE = 90;
 const DAILY_BATCH_DELAY_MS = 1500;
 const DEFAULT_BACKFILL_START_ISO = "2349-01-01T00:00:00";
 const DEFAULT_BACKFILL_END_ISO = "2550-01-01T00:00:00";
+const DEFAULT_PORT = 3210;
+const PTR_REP_788_SWEEP_MINUTES = 15;
+const PTR_REP_788_PER_CALL_DELAY_MS = 60_000;
 
 /** ===== CLI ===== */
 const argv = yargs(hideBin(process.argv))
@@ -43,6 +48,8 @@ const argv = yargs(hideBin(process.argv))
   .option("field-end", { type: "string", default: "endDate" })
   .option("from", { type: "string", desc: "Override backfill start (YYYY-MM-DD)" })
   .option("to", { type: "string", desc: "Override backfill end (YYYY-MM-DD)" })
+  .option("serve", { type: "boolean", default: false, desc: "Start HTTP server with manual endpoints" })
+  .option("port", { type: "number", default: DEFAULT_PORT, desc: "Port for --serve mode" })
   .parse();
 
 /** ===== Helpers ===== */
@@ -248,17 +255,24 @@ function parseAxxerionPayload(rawText) {
   return null;
 }
 
-async function callAxxerion(startDt, endDt) {
+async function callAxxerion(startDt, endDt, options = {}) {
+  const {
+    reference = AX_REFERENCE,
+    fieldStart = argv["field-start"],
+    fieldEnd = argv["field-end"],
+    logHttp = argv["log-http"]
+  } = options;
+
   const body = {
-    reference: AX_REFERENCE,
-    filterFields: [argv["field-start"], argv["field-end"]],
+    reference,
+    filterFields: [fieldStart, fieldEnd],
     filterValues: [fmtAxxerion(startDt), fmtAxxerion(endDt)]
   };
 
   const payload = JSON.stringify(body);
 
-  if (argv["log-http"]) {
-    console.log("HTTP POST", AX_URL);
+  if (logHttp) {
+    console.log(`[${reference}] HTTP POST`, AX_URL);
     console.log("Headers:", { Authorization: "(redacted)", "Content-Type": "text/plain" });
     console.log("Body:", payload);
   }
@@ -272,9 +286,9 @@ async function callAxxerion(startDt, endDt) {
     validateStatus: () => true
   });
 
-  if (argv["log-http"]) {
-    console.log("-> Status:", resp.status, resp.statusText);
-    console.log("-> Resp first 400 chars:", String(resp.data).slice(0, 400));
+  if (logHttp) {
+    console.log(`[${reference}] -> Status:`, resp.status, resp.statusText);
+    console.log(`[${reference}] -> Resp first 400 chars:`, String(resp.data).slice(0, 400));
   }
 
   return resp.data; // raw text
@@ -295,9 +309,10 @@ function normalizeRecords(rawText) {
 }
 
 /** Insert/upsert 1-by-1, keyed by id/objectid; skip if no key. No writes on empty window. */
-async function upsertByKey(pg, records, winStart, winEnd, verbose) {
+async function upsertByKey(pg, records, winStart, winEnd, verbose, options = {}) {
+  const destTable = options.destTable ?? DEST_TABLE;
   const sql = `
-    INSERT INTO ${DEST_TABLE}(id, created_at, updated_at, data)
+    INSERT INTO ${destTable}(id, created_at, updated_at, data)
     VALUES ($1,$2,$3,$4)
     ON CONFLICT (id) DO UPDATE
       SET updated_at = EXCLUDED.updated_at,
@@ -326,13 +341,28 @@ async function upsertByKey(pg, records, winStart, winEnd, verbose) {
   return { loaded, skippedNoKey };
 }
 
-async function processWindow(pg, startDt, endDt, verbose) {
-  console.log(`-> Fetch ${startDt.setZone(TZ).toISO()} .. ${endDt.setZone(TZ).toISO()}`);
+async function processWindow(pg, startDt, endDt, verbose, options = {}) {
+  const {
+    reference = AX_REFERENCE,
+    fieldStart = argv["field-start"],
+    fieldEnd = argv["field-end"],
+    dump = argv.dump,
+    logHttp = argv["log-http"],
+    destTable
+  } = options;
+  const labelPrefix = reference ? `[${reference}] ` : "";
 
-  const rawText = await callAxxerion(startDt.toJSDate(), endDt.toJSDate());
+  console.log(`${labelPrefix}-> Fetch ${startDt.setZone(TZ).toISO()} .. ${endDt.setZone(TZ).toISO()}`);
+
+  const rawText = await callAxxerion(startDt.toJSDate(), endDt.toJSDate(), {
+    reference,
+    fieldStart,
+    fieldEnd,
+    logHttp
+  });
   const { rows, raw, parsed } = normalizeRecords(rawText);
 
-  if (argv.dump) {
+  if (dump) {
     const dir = path.join(process.cwd(), "dumps");
     ensureDir(dir);
     const f = path.join(
@@ -342,26 +372,26 @@ async function processWindow(pg, startDt, endDt, verbose) {
     );
     // Dump the raw text as-is so we can inspect any non-JSON wrappers
     fs.writeFileSync(f, typeof raw === "string" ? raw : String(raw));
-    if (verbose) console.log("   wrote raw dump:", f);
+    if (verbose) console.log(`${labelPrefix}   wrote raw dump:`, f);
   }
 
-  console.log(`   records_from_api=${rows.length}`);
+  console.log(`${labelPrefix}   records_from_api=${rows.length}`);
   if (rows.length) {
-    console.log("   sample_keys:", Object.keys(rows[0]).slice(0, 20).join(", "));
-    const { loaded, skippedNoKey } = await upsertByKey(pg, rows, startDt, endDt, verbose);
+    console.log(`${labelPrefix}   sample_keys:`, Object.keys(rows[0]).slice(0, 20).join(", "));
+    const { loaded, skippedNoKey } = await upsertByKey(pg, rows, startDt, endDt, verbose, { destTable });
     if (skippedNoKey) {
-      console.log(`   loaded_to_db=${loaded} (skipped_missing_key=${skippedNoKey})`);
+      console.log(`${labelPrefix}   loaded_to_db=${loaded} (skipped_missing_key=${skippedNoKey})`);
     } else {
-      console.log(`   loaded_to_db=${loaded}`);
+      console.log(`${labelPrefix}   loaded_to_db=${loaded}`);
     }
   } else {
     // If parsed is null but raw contains "data":[ ... ] we should have caught it;
     // log a hint showing the first 200 chars to help diagnose further edge cases.
     if (!parsed) {
-      console.log("   WARN: could not parse payload; first 200 chars:");
-      console.log(String(raw).slice(0, 200));
+      console.log(`${labelPrefix}   WARN: could not parse payload; first 200 chars:`);
+      console.log(`${labelPrefix}${String(raw).slice(0, 200)}`);
     }
-    console.log("   (no DB writes; empty window)");
+    console.log(`${labelPrefix}   (no DB writes; empty window)`);
   }
 }
 
@@ -453,6 +483,129 @@ async function runPreviousMonthDaily(pg, verbose, label = "Monthly") {
   await processDailyRange(pg, monthStart, monthEnd, verbose, { pauseMs: 0, label });
 }
 
+/** ===== PTR-REP-788 Minute Sweep ===== */
+const ptrRep788State = {
+  job: null,
+  startedAtIso: null,
+  lastRequestedAtIso: null,
+  lastRunStartedAtIso: null,
+  lastRunFinishedAtIso: null,
+  lastError: null,
+  isTickRunning: false,
+  preferredVerbose: argv.verbose,
+  delayPerCallMs: PTR_REP_788_PER_CALL_DELAY_MS,
+  lastCatchupRequestedAtIso: null,
+  lastCatchupCompletedAtIso: null,
+  lastCatchupDays: null
+};
+
+function buildBackwardMinuteWindows(minutes, pivot = DateTime.now().setZone(TZ)) {
+  const totalMinutes = Math.max(0, Math.floor(Number.isFinite(minutes) ? minutes : 0));
+  const windows = [];
+  if (totalMinutes === 0) return windows;
+  const anchor = pivot.startOf("minute");
+  for (let i = 0; i < totalMinutes; i++) {
+    const windowEnd = anchor.minus({ minutes: i });
+    const windowStart = windowEnd.minus({ minutes: 1 });
+    windows.push({ start: windowStart, end: windowEnd });
+  }
+  return windows;
+}
+
+async function runPtrRep788Sweep(pg, options = {}) {
+  const {
+    minutes = PTR_REP_788_SWEEP_MINUTES,
+    pivot = DateTime.now().setZone(TZ),
+    verbose = false,
+    delayMs,
+    reference = PTR_REP_788_REFERENCE,
+    label
+  } = options;
+
+  const minuteVerbose = Boolean(verbose);
+  const windows = buildBackwardMinuteWindows(minutes, pivot);
+  if (!windows.length) {
+    console.log(`[${reference}] No minute windows to process.`);
+    return;
+  }
+
+  const nowIso = DateTime.now().setZone(TZ).toISO();
+  const prefix = `[${label ?? reference}]`;
+  console.log(`${prefix} Starting backward sweep (${windows.length} minute window(s)) at ${nowIso}`);
+
+  const perCallDelay = (() => {
+    if (delayMs != null && Number.isFinite(Number(delayMs))) return Math.max(0, Number(delayMs));
+    if (Number.isFinite(ptrRep788State.delayPerCallMs)) return Math.max(0, ptrRep788State.delayPerCallMs);
+    return PTR_REP_788_PER_CALL_DELAY_MS;
+  })();
+
+  for (let i = 0; i < windows.length; i++) {
+    const { start, end } = windows[i];
+    try {
+      await processWindow(pg, start, end, minuteVerbose, {
+        reference,
+        dump: false,
+        logHttp: false
+      });
+    } catch (err) {
+      const message = err?.message || String(err);
+      console.error(`${prefix} Minute window failure ${start.toISO()} -> ${end.toISO()}:`, message);
+      recordFailures([
+        {
+          start: start.toISO(),
+          end: end.toISO(),
+          message,
+          raw: err?.stack ? String(err.stack) : undefined,
+          occurredAt: new Date().toISOString()
+        }
+      ]);
+    }
+    if (i < windows.length - 1 && perCallDelay > 0) await sleep(perCallDelay);
+  }
+
+  console.log(`${prefix} Backward sweep complete at ${DateTime.now().setZone(TZ).toISO()}`);
+}
+
+async function safeRunPtrRep788Sweep(pg, verboseOverride, sweepOptions = {}) {
+  if (ptrRep788State.isTickRunning) {
+    console.log(`[${PTR_REP_788_REFERENCE}] Sweep already in progress; skipping new trigger.`);
+    return false;
+  }
+  ptrRep788State.isTickRunning = true;
+  if (!ptrRep788State.startedAtIso) ptrRep788State.startedAtIso = new Date().toISOString();
+  ptrRep788State.lastRunStartedAtIso = new Date().toISOString();
+  try {
+    const effectiveVerbose =
+      typeof verboseOverride === "boolean" ? verboseOverride : Boolean(sweepOptions.verbose ?? ptrRep788State.preferredVerbose);
+    const mergedOptions = { verbose: effectiveVerbose, ...sweepOptions };
+    await runPtrRep788Sweep(pg, mergedOptions);
+    ptrRep788State.lastError = null;
+    return true;
+  } catch (err) {
+    ptrRep788State.lastError = err?.message || String(err);
+    console.error(`[${PTR_REP_788_REFERENCE}] Sweep error:`, err?.stack || err);
+    return false;
+  } finally {
+    ptrRep788State.isTickRunning = false;
+    ptrRep788State.lastRunFinishedAtIso = new Date().toISOString();
+  }
+}
+
+function ensurePtrRep788Job(pg) {
+  if (!ptrRep788State.job) {
+    ptrRep788State.job = new CronJob(
+      "*/15 * * * *",
+      () => {
+        void safeRunPtrRep788Sweep(pg, ptrRep788State.preferredVerbose);
+      },
+      null,
+      false,
+      TZ
+    );
+  }
+  return ptrRep788State.job;
+}
+
 async function backfillThenSchedule(pg, verbose) {
   // 1-day windows, 30 at a time, from 2025-09-06 -> 2350-01-01 (override with --from/--to)
   const bfStart = parseRangeBoundary("backfill start", argv.from, DEFAULT_BACKFILL_START_ISO);
@@ -484,11 +637,212 @@ async function backfillThenSchedule(pg, verbose) {
   process.stdin.resume();
 }
 
+async function startHttpServer(pg, defaultVerbose, port) {
+  const app = express();
+  app.use(express.json());
+
+  const routeBase = `/api/reports/${PTR_REP_788_REFERENCE}`;
+
+  const coerceBoolean = (value, fallback = false) => {
+    if (typeof value === "boolean") return value;
+    if (typeof value === "number") return value !== 0;
+    if (typeof value === "string") {
+      const normalized = value.trim().toLowerCase();
+      if (["true", "1", "yes", "y"].includes(normalized)) return true;
+      if (["false", "0", "no", "n"].includes(normalized)) return false;
+    }
+    return fallback;
+  };
+
+  const buildStatus = () => {
+    let nextRunIso = null;
+    const job = ptrRep788State.job;
+    if (job && typeof job.nextDates === "function") {
+      try {
+        const next = job.nextDates();
+        if (Array.isArray(next)) {
+          const first = next[0];
+          nextRunIso = first?.toISO?.() ?? first?.toISOString?.() ?? (first ? String(first) : null);
+        } else {
+          nextRunIso = next?.toISO?.() ?? next?.toISOString?.() ?? (next ? String(next) : null);
+        }
+      } catch (_) {
+        nextRunIso = null;
+      }
+    }
+
+    return {
+      reference: PTR_REP_788_REFERENCE,
+      status: ptrRep788State.isTickRunning
+        ? "running"
+        : ptrRep788State.job?.running
+        ? "scheduled"
+        : "idle",
+      startedAt: ptrRep788State.startedAtIso,
+      lastRequestedAt: ptrRep788State.lastRequestedAtIso,
+      lastRunStartedAt: ptrRep788State.lastRunStartedAtIso,
+      lastRunFinishedAt: ptrRep788State.lastRunFinishedAtIso,
+      nextRun: nextRunIso,
+      isTickRunning: ptrRep788State.isTickRunning,
+      lastError: ptrRep788State.lastError,
+      preferredVerbose: ptrRep788State.preferredVerbose,
+      minutesPerSweep: PTR_REP_788_SWEEP_MINUTES,
+      delayPerCallMs: ptrRep788State.delayPerCallMs,
+      lastCatchupRequestedAt: ptrRep788State.lastCatchupRequestedAtIso,
+      lastCatchupCompletedAt: ptrRep788State.lastCatchupCompletedAtIso,
+      lastCatchupDays: ptrRep788State.lastCatchupDays
+    };
+  };
+
+  app.post(`${routeBase}/refresh`, (req, res) => {
+    const job = ensurePtrRep788Job(pg);
+    const nowIso = new Date().toISOString();
+    ptrRep788State.lastRequestedAtIso = nowIso;
+
+    if (req?.body && typeof req.body === "object") {
+      if (Object.prototype.hasOwnProperty.call(req.body, "verbose")) {
+        ptrRep788State.preferredVerbose = coerceBoolean(req.body.verbose, ptrRep788State.preferredVerbose);
+      }
+    }
+    if (Object.prototype.hasOwnProperty.call(req.query, "verbose")) {
+      ptrRep788State.preferredVerbose = coerceBoolean(req.query.verbose, ptrRep788State.preferredVerbose);
+    }
+
+    const delayCandidate =
+      (req.body && Object.prototype.hasOwnProperty.call(req.body, "delayMs")) ? req.body.delayMs : req.query.delayMs;
+    if (typeof delayCandidate !== "undefined") {
+      const parsedDelay = Number(delayCandidate);
+      if (Number.isFinite(parsedDelay) && parsedDelay >= 0) {
+        ptrRep788State.delayPerCallMs = parsedDelay;
+      }
+    }
+
+    const force = coerceBoolean(req.query.force ?? req.body?.force, false);
+    const wasRunning = job.running;
+    if (!job.running) {
+      job.start();
+    }
+
+    let triggeredImmediate = false;
+    if (!ptrRep788State.isTickRunning) {
+      triggeredImmediate = true;
+      void safeRunPtrRep788Sweep(pg, ptrRep788State.preferredVerbose);
+    } else if (force) {
+      console.log(
+        `[${PTR_REP_788_REFERENCE}] Force refresh requested but sweep already running; skipping additional trigger.`
+      );
+    }
+
+    const status = buildStatus();
+    status.forceRequested = force;
+    status.triggeredImmediate = triggeredImmediate;
+    status.jobWasRunning = wasRunning;
+    res.status(wasRunning ? 202 : 201).json(status);
+  });
+
+  app.post(`${routeBase}/catchup`, (req, res) => {
+    const job = ensurePtrRep788Job(pg);
+    const nowIso = new Date().toISOString();
+    ptrRep788State.lastRequestedAtIso = nowIso;
+
+    const rawDays = req.body?.days ?? req.query?.days;
+    const days = Number(rawDays);
+    if (!Number.isFinite(days) || days <= 0) {
+      return res.status(400).json({
+        error: "Parameter 'days' must be a positive number.",
+        received: rawDays
+      });
+    }
+
+    ptrRep788State.lastCatchupRequestedAtIso = nowIso;
+    ptrRep788State.lastCatchupDays = days;
+
+    if (Object.prototype.hasOwnProperty.call(req.body ?? {}, "verbose")) {
+      ptrRep788State.preferredVerbose = coerceBoolean(
+        req.body.verbose,
+        ptrRep788State.preferredVerbose
+      );
+    }
+    if (Object.prototype.hasOwnProperty.call(req.query ?? {}, "verbose")) {
+      ptrRep788State.preferredVerbose = coerceBoolean(
+        req.query.verbose,
+        ptrRep788State.preferredVerbose
+      );
+    }
+
+    const delayCandidate =
+      (req.body && Object.prototype.hasOwnProperty.call(req.body, "delayMs")) ? req.body.delayMs : req.query?.delayMs;
+    let delayMsOverride;
+    if (typeof delayCandidate !== "undefined") {
+      const parsedDelay = Number(delayCandidate);
+      if (Number.isFinite(parsedDelay) && parsedDelay >= 0) {
+        ptrRep788State.delayPerCallMs = parsedDelay;
+        delayMsOverride = parsedDelay;
+      }
+    }
+
+    const verbose = ptrRep788State.preferredVerbose;
+    const totalMinutes = Math.ceil(days * 24 * 60);
+    if (!Number.isFinite(totalMinutes) || totalMinutes <= 0) {
+      return res.status(400).json({
+        error: "Calculated minutes to process is invalid.",
+        days,
+        totalMinutes
+      });
+    }
+
+    const jobWasRunning = job.running;
+    if (!job.running) job.start();
+
+    const alreadyRunning = ptrRep788State.isTickRunning;
+    const pivot = DateTime.now().setZone(TZ);
+    const label = `${PTR_REP_788_REFERENCE} catchup(${days}d)`;
+    const sweepOptions = { minutes: totalMinutes, pivot, label };
+    if (delayMsOverride != null) sweepOptions.delayMs = delayMsOverride;
+
+    safeRunPtrRep788Sweep(pg, verbose, sweepOptions)
+      .then((triggered) => {
+        if (triggered) ptrRep788State.lastCatchupCompletedAtIso = new Date().toISOString();
+      })
+      .catch((err) => {
+        ptrRep788State.lastError = err?.message || String(err);
+        console.error(`[${PTR_REP_788_REFERENCE}] Catchup sweep error:`, err?.stack || err);
+      });
+
+    const status = buildStatus();
+    status.catchupRequestedDays = days;
+    status.minutesToProcess = totalMinutes;
+    status.catchupTriggered = !alreadyRunning;
+    status.jobWasRunning = jobWasRunning;
+    res.status(202).json(status);
+  });
+
+  app.get(`${routeBase}/status`, (_req, res) => {
+    res.json(buildStatus());
+  });
+
+  ptrRep788State.preferredVerbose = coerceBoolean(defaultVerbose, true);
+
+  await new Promise((resolve) => {
+    app.listen(port, () => {
+      console.log(`HTTP server listening on port ${port}`);
+      console.log(`POST ${routeBase}/refresh to start the backward sweep scheduler.`);
+      console.log(`GET  ${routeBase}/status  to inspect scheduler state.`);
+      resolve();
+    });
+  });
+}
+
 /** ===== Main ===== */
 (async () => {
   const pg = new Client(PG);
   await pg.connect();
   await ensureTable(pg);
+
+  if (argv.serve) {
+    await startHttpServer(pg, argv.verbose, argv.port);
+    return;
+  }
 
   if (argv.test) {
     // Your exact example: 02/07/2000 12:00 AM -> 02/08/2000 12:00 AM (Pacific)
