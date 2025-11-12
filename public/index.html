@@ -22,17 +22,17 @@
       }
 
       .card {
-        width: min(480px, 100%);
-        background: rgba(15, 23, 42, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.3);
-        border-radius: 16px;
-        padding: 2rem;
-        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.6);
+        width: min(960px, 100%);
+        background: rgba(15, 23, 42, 0.94);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 18px;
+        padding: 2.5rem;
+        box-shadow: 0 24px 48px rgba(15, 23, 42, 0.6);
       }
 
       h1 {
         margin: 0 0 0.75rem;
-        font-size: 1.75rem;
+        font-size: 1.9rem;
         text-align: center;
       }
 
@@ -42,26 +42,44 @@
         color: #94a3b8;
       }
 
-      label {
-        display: block;
-        margin-bottom: 0.4rem;
+      .section-title {
+        margin: 2rem 0 0.75rem;
+        font-size: 1.1rem;
         font-weight: 600;
+        text-align: left;
+        color: #f8fafc;
       }
 
-      input {
+      .settings-grid {
+        display: grid;
+        gap: 0.75rem 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .field label {
+        margin-bottom: 0.4rem;
+        font-weight: 600;
+        font-size: 0.92rem;
+      }
+
+      .field input {
         width: 100%;
         padding: 0.65rem 0.8rem;
         border-radius: 10px;
-        border: 1px solid rgba(148, 163, 184, 0.4);
-        background: rgba(15, 23, 42, 0.4);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        background: rgba(15, 23, 42, 0.45);
         color: inherit;
-        font-size: 1rem;
-        margin-bottom: 1rem;
+        font-size: 0.95rem;
       }
 
       button {
         width: 100%;
-        padding: 0.75rem;
+        padding: 0.85rem;
         background: linear-gradient(135deg, #0ea5e9, #6366f1);
         border: none;
         border-radius: 999px;
@@ -69,7 +87,7 @@
         font-weight: 600;
         font-size: 1rem;
         cursor: pointer;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
       }
 
       button:hover {
@@ -77,59 +95,189 @@
         box-shadow: 0 6px 18px rgba(14, 165, 233, 0.35);
       }
 
+      button.secondary {
+        background: rgba(59, 130, 246, 0.1);
+        color: #bfdbfe;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+      }
+
+      button.secondary:hover {
+        box-shadow: none;
+        transform: none;
+        background: rgba(59, 130, 246, 0.2);
+      }
+
       button:disabled {
-        opacity: 0.6;
+        opacity: 0.55;
         cursor: wait;
         transform: none;
         box-shadow: none;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.75rem;
+        margin-top: 1.25rem;
+      }
+
+      .actions--compact {
+        max-width: 240px;
+        margin: 1rem 0 0 auto;
+      }
+
+      .feedback {
+        color: #94a3b8;
+        margin-top: 0.65rem;
+        text-align: center;
+        min-height: 1.5rem;
+        font-size: 0.95rem;
+      }
+
+      .feedback.error {
+        color: #f87171;
+      }
+
+      .feedback.success {
+        color: #4ade80;
+      }
+
+      .feedback.info {
+        color: #38bdf8;
+      }
+
+      .status-grid {
+        margin-top: 1rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+      }
+
+      .status-block {
+        padding: 1rem;
+        border-radius: 14px;
+        background: rgba(30, 41, 59, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+      }
+
+      .status-block h3 {
+        margin: 0 0 0.6rem;
+        font-size: 1rem;
+        color: #cbd5f5;
+      }
+
+      .status-kv {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        font-size: 0.85rem;
+        margin: 0.2rem 0;
+        color: #cbd5f5;
+      }
+
+      .status-kv strong {
+        font-weight: 600;
+        color: #e0e5ff;
+      }
+
+      .activity-list {
+        list-style: none;
+        margin: 1rem 0 0;
+        padding: 0;
+        display: grid;
+        gap: 0.75rem;
+        max-height: 240px;
+        overflow-y: auto;
+      }
+
+      .activity-item {
+        padding: 0.85rem 1rem;
+        border-radius: 14px;
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+      }
+
+      .activity-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.35rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      .activity-status {
+        padding: 0.1rem 0.6rem;
+        border-radius: 999px;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 0.06em;
+        background: rgba(148, 163, 184, 0.2);
+        color: #e2e8f0;
+      }
+
+      .activity-status--running {
+        background: rgba(14, 165, 233, 0.25);
+        color: #38bdf8;
+      }
+
+      .activity-status--completed {
+        background: rgba(34, 197, 94, 0.25);
+        color: #4ade80;
+      }
+
+      .activity-status--skipped {
+        background: rgba(148, 163, 184, 0.2);
+        color: #cbd5f5;
+      }
+
+      .activity-status--failed {
+        background: rgba(248, 113, 113, 0.2);
+        color: #fca5a5;
+      }
+
+      .activity-status--cancelled {
+        background: rgba(249, 115, 22, 0.25);
+        color: #fb923c;
+      }
+
+      .activity-status--cancelling {
+        background: rgba(250, 204, 21, 0.25);
+        color: #facc15;
+      }
+
+      .activity-meta {
+        font-size: 0.8rem;
+        color: #cbd5f5;
+        margin: 0.2rem 0;
+      }
+
+      .activity-error {
+        margin-top: 0.4rem;
+        font-size: 0.8rem;
+        color: #fca5a5;
+      }
+
+      .activity-empty {
+        text-align: center;
+        font-size: 0.85rem;
+        padding: 0.75rem;
+        color: #94a3b8;
+        border-radius: 12px;
+        border: 1px dashed rgba(148, 163, 184, 0.3);
       }
 
       .hidden {
         display: none;
       }
 
-      .status-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 0.75rem;
-        margin-top: 1.5rem;
-      }
-
-      .status-tile {
-        padding: 0.75rem;
-        border-radius: 12px;
-        background: rgba(30, 41, 59, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        font-size: 0.85rem;
-      }
-
-      .status-tile strong {
-        display: block;
-        margin-bottom: 0.35rem;
-        font-size: 0.9rem;
-        color: #f8fafc;
-      }
-
-      .actions {
-        display: grid;
-        gap: 0.75rem;
-        margin-top: 1rem;
-      }
-
-      .error {
-        color: #f87171;
-        margin-top: 0.5rem;
-        text-align: center;
-        min-height: 1.5rem;
-      }
-
-      .success {
-        color: #4ade80;
-      }
-
-      @media (max-width: 600px) {
+      @media (max-width: 640px) {
         body {
           padding: 1.5rem 1rem;
+        }
+
+        .card {
+          padding: 2rem 1.5rem;
         }
       }
     </style>
@@ -139,33 +287,117 @@
       <section id="login-section">
         <h1>PTAmort Control</h1>
         <p>Enter credentials to manage report sweeps.</p>
-        <label for="username">Username</label>
-        <input id="username" autocomplete="username" />
-        <label for="password">Password</label>
-        <input id="password" type="password" autocomplete="current-password" />
-        <button id="login-btn">Sign In</button>
-        <div id="login-error" class="error"></div>
+        <div class="field">
+          <label for="username">Username</label>
+          <input id="username" autocomplete="username" />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" />
+        </div>
+        <div class="actions">
+          <button id="login-btn">Sign In</button>
+        </div>
+        <div id="login-error" class="feedback"></div>
       </section>
 
       <section id="dashboard-section" class="hidden">
-        <h1>PTR-REP-788 Dashboard</h1>
-        <p>Trigger sweeps and inspect live status.</p>
+        <h1>PTAmort Data Control</h1>
+        <p>Configure client settings, trigger loads, and monitor processing status.</p>
+
+        <h2 class="section-title">Connection Settings</h2>
+        <div class="settings-grid">
+          <div class="field">
+            <label for="setting-client-reference">Client Reference</label>
+            <input id="setting-client-reference" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="setting-client-key">Client Key</label>
+            <input id="setting-client-key" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="setting-username">Username</label>
+            <input id="setting-username" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="setting-password">Password</label>
+            <input id="setting-password" type="password" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="setting-batch-ref">Batch Load Report Ref</label>
+            <input id="setting-batch-ref" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="setting-refresh-ref">Refresh Sweep Report Ref</label>
+            <input id="setting-refresh-ref" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="setting-lease-ref">Lease Report Ref</label>
+            <input id="setting-lease-ref" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="setting-region-ref">Region Report Ref</label>
+            <input id="setting-region-ref" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="setting-batch-start">Batch Start (ISO)</label>
+            <input id="setting-batch-start" autocomplete="off" placeholder="e.g. 2024-01-01T00:00:00" />
+          </div>
+          <div class="field">
+            <label for="setting-batch-end">Batch End (ISO)</label>
+            <input id="setting-batch-end" autocomplete="off" placeholder="e.g. 2024-12-31T23:59:59" />
+          </div>
+        </div>
+        <div class="actions actions--compact">
+          <button id="save-settings-btn" class="secondary">Save Settings</button>
+        </div>
+
+        <h2 class="section-title">Actions</h2>
         <div class="actions">
+          <button id="batch-btn">Run Batch Load</button>
           <button id="refresh-btn">Run Last 15 Minutes</button>
           <button id="catchup-btn">Catch Up Last 7 Days</button>
+          <button id="lease-sync-btn">Sync Lease Amortization</button>
+          <button id="region-sync-btn">Sync PT Region</button>
           <button id="status-btn">Refresh Status</button>
+          <button id="cancel-sweep-btn" class="secondary">Cancel Active Sweep</button>
+          <button id="cancel-batch-btn" class="secondary">Cancel Batch Load</button>
         </div>
-        <div id="action-feedback" class="error"></div>
+        <div id="action-feedback" class="feedback"></div>
 
-        <div class="status-grid" id="status-grid">
-          <!-- Filled dynamically -->
-        </div>
+        <h2 class="section-title">Scheduler Status</h2>
+        <div class="status-grid" id="status-grid"></div>
+
+        <h2 class="section-title">Recent Activity</h2>
+        <ul id="activity-list" class="activity-list">
+          <li class="activity-empty">No activity yet.</li>
+        </ul>
       </section>
     </main>
 
     <script>
       const EXPECTED_USER = "admin";
       const EXPECTED_PASS = "ptamortdata001";
+      const DEFAULT_CATCHUP_DAYS = 7;
+      const DEFAULT_REPORT_REFS = {
+        batch: "PTR-REP-783",
+        refresh: "PTR-REP-788",
+        lease: "PTR-REP-799",
+        region: "PTR-REP-807"
+      };
+
+      const DEFAULT_FORM_SETTINGS = {
+        clientReference: "ptrac",
+        clientKey: "ptrac",
+        username: "axuptrac",
+        password: "Qrepoi!55",
+        batchReportRef: DEFAULT_REPORT_REFS.batch,
+        refreshReportRef: DEFAULT_REPORT_REFS.refresh,
+        leaseReportRef: DEFAULT_REPORT_REFS.lease,
+        regionReportRef: DEFAULT_REPORT_REFS.region,
+        batchStartIso: "2020-01-01T00:00:00",
+        batchEndIso: "2550-01-01T00:00:00"
+      };
 
       const loginSection = document.getElementById("login-section");
       const dashboardSection = document.getElementById("dashboard-section");
@@ -173,61 +405,312 @@
       const loginError = document.getElementById("login-error");
       const usernameInput = document.getElementById("username");
       const passwordInput = document.getElementById("password");
+
+      const saveSettingsBtn = document.getElementById("save-settings-btn");
+      const batchBtn = document.getElementById("batch-btn");
       const refreshBtn = document.getElementById("refresh-btn");
       const catchupBtn = document.getElementById("catchup-btn");
+      const leaseSyncBtn = document.getElementById("lease-sync-btn");
+      const regionSyncBtn = document.getElementById("region-sync-btn");
       const statusBtn = document.getElementById("status-btn");
+      const cancelSweepBtn = document.getElementById("cancel-sweep-btn");
+      const cancelBatchBtn = document.getElementById("cancel-batch-btn");
       const statusGrid = document.getElementById("status-grid");
+      const activityList = document.getElementById("activity-list");
       const actionFeedback = document.getElementById("action-feedback");
 
-      function setFeedback(message, kind = "error") {
+      if (cancelSweepBtn) cancelSweepBtn.disabled = true;
+      if (cancelBatchBtn) cancelBatchBtn.disabled = true;
+
+      const settingInputs = {
+        clientReference: document.getElementById("setting-client-reference"),
+        clientKey: document.getElementById("setting-client-key"),
+        username: document.getElementById("setting-username"),
+        password: document.getElementById("setting-password"),
+        batchReportRef: document.getElementById("setting-batch-ref"),
+        refreshReportRef: document.getElementById("setting-refresh-ref"),
+        leaseReportRef: document.getElementById("setting-lease-ref"),
+        regionReportRef: document.getElementById("setting-region-ref"),
+        batchStartIso: document.getElementById("setting-batch-start"),
+        batchEndIso: document.getElementById("setting-batch-end")
+      };
+
+      let currentConfig = null;
+      let latestStatus = null;
+      let statusIntervalId = null;
+      let activityIntervalId = null;
+      let feedbackTimeout = null;
+
+      function setFeedback(message, kind = "info") {
+        if (feedbackTimeout) {
+          clearTimeout(feedbackTimeout);
+          feedbackTimeout = null;
+        }
         actionFeedback.textContent = message ?? "";
-        actionFeedback.className = kind === "success" ? "error success" : "error";
+        actionFeedback.className = `feedback${kind ? ` ${kind}` : ""}`;
+        if (message) {
+          feedbackTimeout = setTimeout(() => {
+            actionFeedback.textContent = "";
+            actionFeedback.className = "feedback";
+          }, 8000);
+        }
+      }
+
+      function setLoginError(message) {
+        loginError.textContent = message ?? "";
+        loginError.className = message ? "feedback error" : "feedback";
+      }
+
+      function boolLabel(value) {
+        return value ? "Yes" : "No";
+      }
+
+      function formatValue(value) {
+        if (value === null || value === undefined || value === "") return "-";
+        if (typeof value === "boolean") return boolLabel(value);
+        return String(value);
+      }
+
+      function escapeHtml(input) {
+        return String(input ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function updateActionStates(status) {
+        if (leaseSyncBtn) {
+          const lease = status?.leaseLoad;
+          leaseSyncBtn.disabled = Boolean(lease?.isRunning);
+        }
+        if (regionSyncBtn) {
+          const region = status?.regionLoad;
+          regionSyncBtn.disabled = Boolean(region?.isRunning);
+        }
+        if (cancelSweepBtn) {
+          const canCancelSweep = Boolean(status?.isTickRunning) && !status?.cancelRequested;
+          cancelSweepBtn.disabled = !canCancelSweep;
+        }
+        if (cancelBatchBtn) {
+          const batch = status?.batchLoad ?? {};
+          const canCancelBatch = Boolean(batch.isRunning) && !batch.cancelRequested;
+          cancelBatchBtn.disabled = !canCancelBatch;
+        }
       }
 
       function renderStatus(status) {
-        if (!status || typeof status !== "object") {
-          statusGrid.innerHTML = "<p>No status data.</p>";
+        latestStatus = status && typeof status === "object" ? status : null;
+        if (!latestStatus) {
+          statusGrid.innerHTML = '<div class="status-block"><p>No status data.</p></div>';
+          updateActionStates(null);
           return;
         }
-        const entries = [
-          ["Reference", status.reference],
-          ["State", status.status],
-          ["Started", status.startedAt],
-          ["Last Requested", status.lastRequestedAt],
-          ["Last Run Start", status.lastRunStartedAt],
-          ["Last Run Finish", status.lastRunFinishedAt],
-          ["Next Run", status.nextRun],
-          ["In Progress", status.isTickRunning ? "Yes" : "No"],
-          ["Last Error", status.lastError ?? "None"],
-          ["Catchup Days", status.lastCatchupDays ?? "-"],
-          ["Delay / call (ms)", status.delayPerCallMs],
-          ["Minutes / sweep", status.minutesPerSweep],
-          ["Preferred Verbose", status.preferredVerbose ? "Yes" : "No"]
+
+        const safeStatus = latestStatus;
+
+        const refreshEntries = [
+          ["Refresh Reference", safeStatus.refreshReference],
+          ["State", safeStatus.status],
+          ["Started", safeStatus.startedAt],
+          ["Last Requested", safeStatus.lastRequestedAt],
+          ["Last Run Start", safeStatus.lastRunStartedAt],
+          ["Last Run Finish", safeStatus.lastRunFinishedAt],
+          ["Next Run", safeStatus.nextRun],
+          ["In Progress", safeStatus.isTickRunning],
+          ["Cancel Requested", safeStatus.cancelRequested],
+          ["Last Cancel Request", safeStatus.lastCancelRequestedAt],
+          ["Last Cancelled", safeStatus.lastCancelledAt],
+          ["Activity Id", safeStatus.currentActivityId],
+          ["Last Error", safeStatus.lastError],
+          ["Verbose", safeStatus.preferredVerbose],
+          ["Minutes / Sweep", safeStatus.minutesPerSweep],
+          ["Delay / Call (ms)", safeStatus.delayPerCallMs],
+          ["Catchup Requested", safeStatus.lastCatchupRequestedAt],
+          ["Catchup Completed", safeStatus.lastCatchupCompletedAt],
+          ["Catchup Days", safeStatus.lastCatchupDays]
         ];
-        statusGrid.innerHTML = entries
+
+        const batch = safeStatus.batchLoad ?? {};
+        const batchEntries = [
+          ["Batch Reference", batch.reference],
+          ["Running", batch.isRunning],
+          ["Cancel Requested", batch.cancelRequested],
+          ["Last Requested", batch.lastRequestedAt],
+          ["Last Run Start", batch.lastRunStartedAt],
+          ["Last Run Finish", batch.lastRunFinishedAt],
+          ["Last Error", batch.lastError],
+          ["Last Start ISO", batch.lastStartIso],
+          ["Last End ISO", batch.lastEndIso],
+          ["Last Cancel Request", batch.lastCancelRequestedAt],
+          ["Last Cancelled", batch.lastCancelledAt],
+          ["Activity Id", batch.currentActivityId]
+        ];
+
+        const lease = safeStatus.leaseLoad ?? {};
+        const leaseSummary = lease.summary ?? {};
+        const leaseEntries = [
+          ["Lease Reference", lease.reference],
+          ["Running", lease.isRunning],
+          ["Cancel Requested", lease.cancelRequested],
+          ["Last Requested", lease.lastRequestedAt],
+          ["Last Run Start", lease.lastRunStartedAt],
+          ["Last Run Finish", lease.lastRunFinishedAt],
+          ["Last Error", lease.lastError],
+          ["Last Cancel Request", lease.lastCancelRequestedAt],
+          ["Last Cancelled", lease.lastCancelledAt],
+          ["Activity Id", lease.currentActivityId],
+          ["Contracts Fetched", leaseSummary.contractsFetched],
+          ["Contracts Processed", leaseSummary.contractsProcessed],
+          ["Missing References", leaseSummary.contractsMissingReference],
+          ["Items Fetched", leaseSummary.itemsFetched],
+          ["Items Inserted", leaseSummary.itemsInserted],
+          ["Items Skipped", leaseSummary.itemsSkipped],
+          ["Error Count", leaseSummary.errorCount],
+          ["Last Reference", leaseSummary.lastReference],
+          ["Started At", leaseSummary.startedAt],
+          ["Completed At", leaseSummary.completedAt]
+        ];
+
+        const region = safeStatus.regionLoad ?? {};
+        const regionSummary = region.summary ?? {};
+        const regionEntries = [
+          ["Region Reference", region.reference],
+          ["Running", region.isRunning],
+          ["Cancel Requested", region.cancelRequested],
+          ["Last Requested", region.lastRequestedAt],
+          ["Last Run Start", region.lastRunStartedAt],
+          ["Last Run Finish", region.lastRunFinishedAt],
+          ["Last Error", region.lastError],
+          ["Last Start ISO", region.lastStartIso],
+          ["Last End ISO", region.lastEndIso],
+          ["Last Cancel Request", region.lastCancelRequestedAt],
+          ["Last Cancelled", region.lastCancelledAt],
+          ["Activity Id", region.currentActivityId],
+          ["Records Fetched", regionSummary.recordsFromApi ?? region.currentRecordsFromApi],
+          ["Rows Inserted", regionSummary.loadedToDb ?? region.currentLoadedToDb],
+          ["Rows Skipped", regionSummary.skippedNoKey ?? region.currentSkippedNoKey],
+          ["Started At", regionSummary.startedAt],
+          ["Completed At", regionSummary.completedAt]
+        ];
+
+        const blocks = [
+          { title: "Refresh Sweep", entries: refreshEntries },
+          { title: "Batch Load", entries: batchEntries },
+          { title: "Lease Amortization Load", entries: leaseEntries },
+          { title: "PT Region Load", entries: regionEntries }
+        ];
+
+        statusGrid.innerHTML = blocks
           .map(
-            ([label, value]) => `
-              <div class="status-tile">
-                <strong>${label}</strong>
-                <span>${value ?? "-"}</span>
-              </div>
-            `
+            (block) => `
+              <div class="status-block">
+                <h3>${escapeHtml(block.title)}</h3>
+                ${block.entries
+                  .map(
+                    ([label, value]) => `
+                      <div class="status-kv">
+                        <strong>${escapeHtml(label)}</strong>
+                        <span>${escapeHtml(formatValue(value))}</span>
+                      </div>`
+                  )
+                  .join("")}
+              </div>`
           )
+          .join("");
+
+        updateActionStates(safeStatus);
+      }
+
+      function renderActivity(items) {
+        if (!Array.isArray(items) || items.length === 0) {
+          activityList.innerHTML = '<li class="activity-empty">No activity yet.</li>';
+          return;
+        }
+
+        activityList.innerHTML = items
+          .map((item) => {
+            const status = (item.status ?? "unknown").toLowerCase();
+            return `
+              <li class="activity-item">
+                <div class="activity-head">
+                  <span>${escapeHtml(item.functionName ?? "Action")}</span>
+                  <span class="activity-status activity-status--${escapeHtml(status)}">${escapeHtml(status)}</span>
+                </div>
+                <div class="activity-meta">Client: ${escapeHtml(item.clientReference)} / ${escapeHtml(item.clientKey)}</div>
+                <div class="activity-meta">Report: ${escapeHtml(item.reportReference)}</div>
+                <div class="activity-meta">Started: ${escapeHtml(formatValue(item.startedAt))}</div>
+                <div class="activity-meta">Completed: ${escapeHtml(formatValue(item.completedAt))}</div>
+                ${
+                  item.error
+                    ? `<div class="activity-error">Error: ${escapeHtml(item.error)}</div>`
+                    : ""
+                }
+              </li>`;
+          })
           .join("");
       }
 
-      async function fetchStatus() {
-        try {
-          const resp = await fetch("/api/reports/PTR-REP-788/status", {
-            headers: { "Accept": "application/json" }
-          });
-          if (!resp.ok) throw new Error("HTTP " + resp.status);
-          const data = await resp.json();
-          renderStatus(data);
-        } catch (err) {
-          console.error("Status fetch failed:", err);
-          setFeedback("Failed to fetch status: " + err.message);
-        }
+      function populateSettings(config) {
+        if (!config) return;
+        Object.entries(settingInputs).forEach(([key, input]) => {
+          if (input) input.value = config[key] ?? "";
+        });
+      }
+
+      function mergeWithDefaults(cfg = {}) {
+        const merged = { ...DEFAULT_FORM_SETTINGS };
+        let missing = false;
+        Object.entries(DEFAULT_FORM_SETTINGS).forEach(([key, defaultValue]) => {
+          const value = cfg[key];
+          if (value === undefined || value === null || String(value).trim() === "") {
+            missing = true;
+            merged[key] = defaultValue;
+          } else {
+            merged[key] = value;
+          }
+        });
+        return { merged, missing };
+      }
+
+      function collectSettings() {
+        return Object.entries(settingInputs).reduce((acc, [key, input]) => {
+          acc[key] = input?.value?.trim?.() ?? "";
+          return acc;
+        }, {});
+      }
+
+      function getRefreshReference() {
+        return (currentConfig?.refreshReportRef ?? DEFAULT_REPORT_REFS.refresh).trim() || DEFAULT_REPORT_REFS.refresh;
+      }
+
+      function getBatchReference() {
+        return (currentConfig?.batchReportRef ?? DEFAULT_REPORT_REFS.batch).trim() || DEFAULT_REPORT_REFS.batch;
+      }
+
+      function getLeaseReference() {
+        return (currentConfig?.leaseReportRef ?? DEFAULT_REPORT_REFS.lease).trim() || DEFAULT_REPORT_REFS.lease;
+      }
+
+      function getRegionReference() {
+        return (currentConfig?.regionReportRef ?? DEFAULT_REPORT_REFS.region).trim() || DEFAULT_REPORT_REFS.region;
+      }
+
+      function getRefreshEndpoint(segment) {
+        return `/api/reports/${encodeURIComponent(getRefreshReference())}/${segment}`;
+      }
+
+      function getBatchEndpoint(segment) {
+        return `/api/reports/${encodeURIComponent(getBatchReference())}/${segment}`;
+      }
+
+      function getLeaseEndpoint(segment) {
+        return `/api/reports/${encodeURIComponent(getLeaseReference())}/${segment}`;
+      }
+
+      function getRegionEndpoint(segment) {
+        return `/api/reports/${encodeURIComponent(getRegionReference())}/${segment}`;
       }
 
       async function postJson(url, body) {
@@ -235,69 +718,378 @@
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Accept": "application/json"
+            Accept: "application/json"
           },
-          body: JSON.stringify(body)
+          body: JSON.stringify(body ?? {})
         });
-        if (!resp.ok) {
-          const text = await resp.text();
-          throw new Error(resp.status + " " + resp.statusText + ": " + text);
+        const raw = await resp.text();
+        let payload = null;
+        if (raw) {
+          try {
+            payload = JSON.parse(raw);
+          } catch (_) {
+            payload = null;
+          }
         }
-        return resp.json();
+        if (!resp.ok) {
+          const error = new Error(
+            payload?.error ?? `${resp.status} ${resp.statusText}`
+          );
+          error.status = resp.status;
+          error.payload = payload;
+          throw error;
+        }
+        return payload ?? {};
       }
 
-      loginBtn.addEventListener("click", () => {
-        const user = usernameInput.value.trim();
-        const pass = passwordInput.value;
-        if (user !== EXPECTED_USER || pass !== EXPECTED_PASS) {
-          loginError.textContent = "Invalid credentials.";
-          return;
+      async function fetchConfig() {
+        const resp = await fetch("/api/config");
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const cfg = await resp.json();
+        const { merged, missing } = mergeWithDefaults(cfg);
+        currentConfig = merged;
+        populateSettings(merged);
+        if (missing) {
+          try {
+            const persisted = await postJson("/api/config", merged);
+            const normalized = mergeWithDefaults(persisted).merged;
+            currentConfig = normalized;
+            populateSettings(normalized);
+          } catch (err) {
+            console.warn("Failed to persist default settings automatically:", err);
+          }
         }
-        loginError.textContent = "";
-        loginSection.classList.add("hidden");
-        dashboardSection.classList.remove("hidden");
-        fetchStatus();
-        setInterval(fetchStatus, 60_000);
-      });
+        return currentConfig;
+      }
 
-      refreshBtn.addEventListener("click", async () => {
+      async function fetchStatus() {
+        try {
+          const resp = await fetch(getRefreshEndpoint("status"));
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          renderStatus(data);
+        } catch (err) {
+          console.error("Failed to fetch status:", err);
+          setFeedback(`Failed to fetch status: ${err.message}`, "error");
+        }
+      }
+
+      async function fetchActivity() {
+        try {
+          const resp = await fetch("/api/activity");
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          renderActivity(data.items ?? []);
+        } catch (err) {
+          console.error("Failed to fetch activity:", err);
+          setFeedback(`Failed to fetch activity: ${err.message}`, "error");
+        }
+      }
+
+      async function refreshStatusAndActivity() {
+        await Promise.allSettled([fetchStatus(), fetchActivity()]);
+      }
+
+      function startPolling() {
+        if (statusIntervalId) clearInterval(statusIntervalId);
+        if (activityIntervalId) clearInterval(activityIntervalId);
+        statusIntervalId = setInterval(fetchStatus, 60_000);
+        activityIntervalId = setInterval(fetchActivity, 60_000);
+      }
+
+      async function saveSettings() {
+        try {
+          saveSettingsBtn.disabled = true;
+          setFeedback("Saving settings...", "info");
+          const updated = await postJson("/api/config", collectSettings());
+          currentConfig = updated;
+          populateSettings(updated);
+          setFeedback("Settings saved.", "success");
+        } catch (err) {
+          console.error("Failed to save settings:", err);
+          setFeedback(`Failed to save settings: ${err.message}`, "error");
+        } finally {
+          saveSettingsBtn.disabled = false;
+        }
+      }
+
+      async function triggerBatchLoad() {
+        try {
+          batchBtn.disabled = true;
+          setFeedback("Starting batch load...", "info");
+          const payload = {
+            start: settingInputs.batchStartIso.value.trim(),
+            end: settingInputs.batchEndIso.value.trim(),
+            verbose: true
+          };
+          const response = await postJson(getBatchEndpoint("batchload"), payload);
+          if (response?.status) renderStatus(response.status);
+          setFeedback("Batch load triggered.", "success");
+          await refreshStatusAndActivity();
+        } catch (err) {
+          console.error("Batch load failed:", err);
+          setFeedback(`Batch load failed: ${err.message}`, "error");
+        } finally {
+          batchBtn.disabled = false;
+        }
+      }
+
+      async function triggerRefresh() {
         try {
           refreshBtn.disabled = true;
-          setFeedback("Triggering 15-minute sweep...");
-          await postJson("/api/reports/PTR-REP-788/refresh", { verbose: true });
-          setFeedback("15-minute sweep triggered.", "success");
-          await fetchStatus();
+          setFeedback("Triggering 15-minute sweep...", "info");
+          const response = await postJson(getRefreshEndpoint("refresh"), { verbose: true });
+          if (response?.status) renderStatus(response.status);
+          const alreadyRunning = Boolean(response?.jobWasRunning);
+          const message = alreadyRunning
+            ? `15-minute sweep already running for ${response.reference}.`
+            : `15-minute sweep queued for ${response.reference}.`;
+          setFeedback(message, alreadyRunning ? "warning" : "success");
+          await refreshStatusAndActivity();
         } catch (err) {
-          console.error(err);
-          setFeedback("Refresh failed: " + err.message);
+          console.error("Refresh failed:", err);
+          setFeedback(`Refresh failed: ${err.message}`, "error");
         } finally {
           refreshBtn.disabled = false;
         }
-      });
+      }
 
-      catchupBtn.addEventListener("click", async () => {
+      async function triggerCatchup() {
         try {
           catchupBtn.disabled = true;
-          setFeedback("Starting 7-day catchup...");
-          await postJson("/api/reports/PTR-REP-788/catchup", { days: 7, verbose: true });
-          setFeedback("Catchup triggered.", "success");
-          await fetchStatus();
+          setFeedback(`Starting ${DEFAULT_CATCHUP_DAYS}-day catchup...`, "info");
+          const response = await postJson(getRefreshEndpoint("catchup"), {
+            days: DEFAULT_CATCHUP_DAYS,
+            verbose: true
+          });
+          if (response?.status) renderStatus(response.status);
+          setFeedback(`Catchup queued for ${response.reference}.`, "success");
         } catch (err) {
-          console.error(err);
-          setFeedback("Catchup failed: " + err.message);
+          console.error("Catchup failed:", err);
+          setFeedback(`Catchup failed: ${err.message}`, "error");
         } finally {
+          await refreshStatusAndActivity();
           catchupBtn.disabled = false;
         }
-      });
+      }
 
-      statusBtn.addEventListener("click", fetchStatus);
+      async function callLeaseSyncApi(payload) {
+        const endpoints = [
+          getLeaseEndpoint("lease-amortization"),
+          "/api/lease-amortization/run"
+        ];
+        let lastError = null;
+        for (const endpoint of endpoints) {
+          try {
+            const body = { verbose: true, ...(payload || {}) };
+            console.log("[LeaseSync] POST", endpoint, body);
+            const result = await postJson(endpoint, body);
+            console.log("[LeaseSync] Response", endpoint, result);
+            return result;
+          } catch (err) {
+            lastError = err;
+            if (err?.status !== 404) throw err;
+            console.warn("[LeaseSync] Endpoint failed", endpoint, err);
+          }
+        }
+        throw lastError ?? new Error("Lease amortization endpoint unavailable.");
+      }
 
+      async function triggerLeaseSync() {
+        if (!leaseSyncBtn) return;
+        try {
+          leaseSyncBtn.disabled = true;
+          setFeedback("Starting lease amortization sync...", "info");
+          const payload = {
+            start: settingInputs.batchStartIso.value.trim(),
+            end: settingInputs.batchEndIso.value.trim(),
+            verbose: true
+          };
+          const response = await callLeaseSyncApi(payload);
+          if (response?.status) renderStatus(response.status);
+          const status = response?.status?.leaseLoad ?? {};
+          const summary = response?.summary ?? status.summary ?? {};
+          const wasRunning = Boolean(status.isRunning);
+          const detail = summary.contractsFetched
+            ? ` Last summary: ${summary.contractsProcessed ?? 0}/${summary.contractsFetched} contracts, ${summary.itemsInserted ?? 0} items inserted.`
+            : "";
+          const message = wasRunning
+            ? `Lease amortization load already running for ${response.reference}.${detail}`
+            : `Lease amortization load queued for ${response.reference}.${detail}`;
+          setFeedback(message.trim(), wasRunning ? "warning" : "success");
+        } catch (err) {
+          console.error("Lease amortization sync failed:", err);
+          if (err?.payload?.status) renderStatus(err.payload.status);
+          const isConflict = err?.status === 409 || /already running/i.test(err?.message ?? "");
+          const message = isConflict
+            ? "Lease amortization sync is already running."
+            : `Lease amortization sync failed: ${err.message}`;
+          setFeedback(message, isConflict ? "warning" : "error");
+          leaseSyncBtn.disabled = false;
+        } finally {
+          await refreshStatusAndActivity();
+          if (!latestStatus?.leaseLoad?.isRunning) {
+            leaseSyncBtn.disabled = false;
+          }
+        }
+      }
+
+      async function callRegionSyncApi(payload) {
+        const endpoints = [
+          getRegionEndpoint("ptregion"),
+          "/api/ptregion/run"
+        ];
+        let lastError = null;
+        for (const endpoint of endpoints) {
+          try {
+            const body = { verbose: true, ...(payload || {}) };
+            console.log("[RegionSync] POST", endpoint, body);
+            const result = await postJson(endpoint, body);
+            console.log("[RegionSync] Response", endpoint, result);
+            return result;
+          } catch (err) {
+            lastError = err;
+            if (err?.status !== 404) throw err;
+            console.warn("[RegionSync] Endpoint failed", endpoint, err);
+          }
+        }
+        throw lastError ?? new Error("PT Region endpoint unavailable.");
+      }
+
+      async function triggerRegionSync() {
+        if (!regionSyncBtn) return;
+        try {
+          regionSyncBtn.disabled = true;
+          setFeedback("Starting PT Region load...", "info");
+          const payload = {
+            start: settingInputs.batchStartIso.value.trim(),
+            end: settingInputs.batchEndIso.value.trim(),
+            verbose: true
+          };
+          const response = await callRegionSyncApi(payload);
+          if (response?.status) renderStatus(response.status);
+          const status = response?.status?.regionLoad ?? {};
+          const summary = response?.summary ?? status.summary ?? {};
+          const wasRunning = Boolean(status.isRunning);
+          const detail = summary.recordsFromApi
+            ? ` Last summary: ${summary.loadedToDb ?? 0}/${summary.recordsFromApi ?? 0} rows inserted.`
+            : "";
+          const message = wasRunning
+            ? `PT Region load already running for ${response.reference}.${detail}`
+            : `PT Region load queued for ${response.reference}.${detail}`;
+          setFeedback(message.trim(), wasRunning ? "warning" : "success");
+        } catch (err) {
+          console.error("PT Region load failed:", err);
+          if (err?.payload?.status) renderStatus(err.payload.status);
+          const isConflict = err?.status === 409 || /already running/i.test(err?.message ?? "");
+          const message = isConflict
+            ? "PT Region load is already running."
+            : `PT Region load failed: ${err.message}`;
+          setFeedback(message, isConflict ? "warning" : "error");
+          regionSyncBtn.disabled = false;
+        } finally {
+          await refreshStatusAndActivity();
+          if (!latestStatus?.regionLoad?.isRunning) {
+            regionSyncBtn.disabled = false;
+          }
+        }
+      }
+
+      async function cancelSweep() {
+        if (!cancelSweepBtn) return;
+        try {
+          cancelSweepBtn.disabled = true;
+          setFeedback("Requesting sweep cancellation...", "info");
+          const response = await postJson(getRefreshEndpoint("cancel"), {});
+          if (response?.status) renderStatus(response.status);
+          const reason = response?.reason;
+          const message =
+            reason === "already_requested"
+              ? "Sweep cancellation already requested."
+              : "Sweep cancellation requested.";
+          setFeedback(message, reason === "already_requested" ? "warning" : "success");
+          await refreshStatusAndActivity();
+        } catch (err) {
+          console.error("Cancel sweep failed:", err);
+          if (err?.payload?.status) renderStatus(err.payload.status);
+          const isConflict = err?.status === 409 || /409/.test(err?.message ?? "");
+          setFeedback(
+            isConflict ? "No sweep is currently running." : `Cancel sweep failed: ${err.message}`,
+            isConflict ? "warning" : "error"
+          );
+          cancelSweepBtn.disabled = false;
+        }
+      }
+
+      async function cancelBatch() {
+        if (!cancelBatchBtn) return;
+        try {
+          cancelBatchBtn.disabled = true;
+          setFeedback("Requesting batch cancellation...", "info");
+          const response = await postJson(getBatchEndpoint("batchcancel"), {});
+          if (response?.status) renderStatus(response.status);
+          const reason = response?.reason;
+          const message =
+            reason === "already_requested"
+              ? "Batch cancellation already requested."
+              : "Batch cancellation requested.";
+          setFeedback(message, reason === "already_requested" ? "warning" : "success");
+          await refreshStatusAndActivity();
+        } catch (err) {
+          console.error("Cancel batch failed:", err);
+          if (err?.payload?.status) renderStatus(err.payload.status);
+          const isConflict = err?.status === 409 || /409/.test(err?.message ?? "");
+          setFeedback(
+            isConflict ? "No batch load is currently running." : `Cancel batch failed: ${err.message}`,
+            isConflict ? "warning" : "error"
+          );
+          cancelBatchBtn.disabled = false;
+        }
+      }
+
+      async function initialiseDashboard() {
+        try {
+          setFeedback("Loading configuration...", "info");
+          await fetchConfig();
+          await refreshStatusAndActivity();
+          startPolling();
+          setFeedback("Ready.", "success");
+        } catch (err) {
+          console.error("Initialisation failed:", err);
+          setFeedback(`Failed to initialise: ${err.message}`, "error");
+        }
+      }
+
+      function attemptLogin() {
+        const user = usernameInput.value.trim();
+        const pass = passwordInput.value;
+        if (user !== EXPECTED_USER || pass !== EXPECTED_PASS) {
+          setLoginError("Invalid credentials.");
+          return;
+        }
+        setLoginError("");
+        loginSection.classList.add("hidden");
+        dashboardSection.classList.remove("hidden");
+        void initialiseDashboard();
+      }
+
+      loginBtn.addEventListener("click", attemptLogin);
       passwordInput.addEventListener("keypress", (event) => {
         if (event.key === "Enter") {
           event.preventDefault();
-          loginBtn.click();
+          attemptLogin();
         }
       });
+
+      saveSettingsBtn.addEventListener("click", saveSettings);
+      batchBtn.addEventListener("click", triggerBatchLoad);
+      refreshBtn.addEventListener("click", triggerRefresh);
+      catchupBtn.addEventListener("click", triggerCatchup);
+      if (leaseSyncBtn) leaseSyncBtn.addEventListener("click", triggerLeaseSync);
+      if (regionSyncBtn) regionSyncBtn.addEventListener("click", triggerRegionSync);
+      statusBtn.addEventListener("click", refreshStatusAndActivity);
+      if (cancelSweepBtn) cancelSweepBtn.addEventListener("click", cancelSweep);
+      if (cancelBatchBtn) cancelBatchBtn.addEventListener("click", cancelBatch);
     </script>
   </body>
 </html>
